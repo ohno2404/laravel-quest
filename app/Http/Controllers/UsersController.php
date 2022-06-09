@@ -22,6 +22,7 @@ class UsersController extends Controller
             'movies' => $movies,
         ];
         $data += $this->counts($user);
+        
         return view('users.show',$data);
     }
     
@@ -54,7 +55,18 @@ class UsersController extends Controller
             'users' =>$followings,
             ];
             
-        $data += $this->count($user);
+        $data += $this->counts($user);
         return view('users.followings',$data);
+    }
+     public function followers($id)
+    {
+        $user = User::find($id);
+        $followers = $user->followers()->paginate(9);
+        $data = [
+            'user' => $user,
+            'users' => $followers,
+        ];
+        $data += $this->counts($user);
+        return view('users.followers', $data);
     }
 }

@@ -32,24 +32,25 @@ Route::post('login','Auth\LoginController@login')
 Route::get('logout','Auth\LoginController@logout')
 ->name('logout');
 
-
-Route::resource('users','UsersController',['only' =>['show']]);
-
-Route::group(['prefix'=> 'users/{id}'],function(){
-     Route::get('followings','UserController@followings')->name('followings');
-     Route::get('followers','UserController@followers')->name('followers');
-     
+//user一覧
+Route::resource('users', 'UsersController', ['only' => ['show']]);
+//フォロー機能
+Route::group(['prefix' => 'users/{id}'], function () {
+    Route::get('followings', 'UsersController@followings')->name('followings');
+    Route::get('followers', 'UsersController@followers')->name('followers');
+    });
+//ログインしている状態で使う機能一覧
+Route::group(['middleware' => 'auth'], function () {
+    Route::put('users', 'UsersController@rename')->name('rename');
+    Route::group(['prefix' => 'users/{id}'], function () {
+        Route::post('follow', 'UserFollowController@store')->name('follow');
+        Route::delete('unfollow', 'UserFollowController@destroy')->name('unfollow');
+    });
+    Route::resource('movies', 'MoviesController', ['only' => ['create', 'store', 'destroy']]);
 });
-Route::group(['middleware' => 'auth'],function(){
-     Route::put('users','UsersController@rename')->name('rename');
-     Route::group([ 'prefix'=> 'users/{id}' ],function() {
-            Route::post('follow','UserFollowController@store')->name('follow');
-            Route::delete('unfollow','UserFollowController@destroy')->name('unfollow');
-     
-     });
-     Route::resource('movies', 'MoviesController', ['only' => ['create', 'store', 'destroy']]);
-   
-});
+
+//RESTAPI
+Route::resource('rest','RestappController',['only'=> ['index','show','create','store','destroy']]);
 
 
 
